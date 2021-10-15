@@ -49,9 +49,12 @@ private:
         auto Right = glm::normalize(glm::cross(Front, glm::vec3(0.0,1.0,0.0)));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         auto Up    = glm::normalize(glm::cross(Right, Front));
 
+
         m_LightView = glm::lookAt(pos,
                                   glm::vec3( 0.0f, 0.0f,  0.0f),
                                   Up);
+
+       m_LightView =  glm::lookAt(pos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
     }
 
 public:

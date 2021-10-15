@@ -30,6 +30,9 @@ private:
     ScreenRenderQuad* m_PostProcessQuad;
 
     list<EntityBase*> m_CurRenderEntities;
+
+    glm::mat4 lightmat;
+    glm::vec3 lightpos;
 private:
     ScreenRenderQuad* BuildOneScreenRenderQuad(){
         ScreenRenderQuad* result = nullptr;
@@ -278,10 +281,15 @@ public:
                         et.GetMaterial().SetUpShadowTexture(shadowid);
                     }
 
-                    et.GetMaterial().GetMatShader().use();
-                    et.GetMaterial().GetMatShader().setMat4("view",m_View);
-                    et.GetMaterial().GetMatShader().setMat4("projection",m_Projection);
-                    et.GetMaterial().GetMatShader().setMat4("model", et.GetTransform().GetModelMat());
+                    auto sdid = et.GetMaterial().GetMatShader();
+
+                    sdid.use();
+                    sdid.setMat4("view",m_View);
+                    sdid.setMat4("projection",m_Projection);
+                    sdid.setMat4("model", et.GetTransform().GetModelMat());
+                    sdid.setMat4("lightSpaceMatrix",lightmat);
+                    sdid.setVec3("viewPos",m_ViewPos);
+                    sdid.setVec3("lightPos",lightpos);
                     et.DrawEntity();
                 }
 
@@ -304,11 +312,15 @@ public:
                     for(;lightit != lights.end();++lightit){
                         Light* curlt = dynamic_cast<Light*>(*lightit);
                         glm::mat4 lightSpaceMatrix = curlt->GetLightProj() * curlt->GetLightView();
+                        lightmat = lightSpaceMatrix;
+                        lightpos = *(curlt->GetTransform().GetPosition());
                         sd.setMat4("lightSpaceMatrix",lightSpaceMatrix);
                         for(;it!= entities.end();it++){
                             EntityBase et = *(*it);
-                            sd.setMat4("model", et.GetTransform().GetModelMat());
-                            et.DrawEntity();
+                            if(et.GetCastShadow()){
+                                sd.setMat4("model", et.GetTransform().GetModelMat());
+                                et.DrawEntity();
+                            }
                         }
                     }
 

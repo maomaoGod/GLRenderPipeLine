@@ -89,6 +89,7 @@ public:
         m_txType = txtype;
     }
 
+
     string TexturePath(){
         return m_txPath;
     }

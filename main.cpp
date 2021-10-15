@@ -88,19 +88,20 @@ int main()
     Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
     scene.AddCamera(&camera);
     //创建cube
-    vector<string> txpath;
+    map<string,string> txpath;
     EntityBase* cub1 = new Cube();
     glm::vec3 tmpvec = glm::vec3(1.0f,1.0f,1.0f);
     cub1->GetTransform().SetScale(tmpvec );
-    tmpvec = glm::vec3(-1.0f,0.0f,-1.0f);
+    tmpvec = glm::vec3(-1.0f,0.6f,-1.0f);
     cub1->GetTransform().SetPosition(tmpvec);
     Material cb1mat;
     cb1mat.SetUpShader(shaderpathprefix+"/Shadow/shadow_mapping.vs",shaderpathprefix+"/Shadow/shadow_mapping.fs","");
     //cb1mat.SetUpShader(shaderpathprefix+"/5.2.framebuffers.vs",shaderpathprefix+"/5.2.framebuffers.fs","");
     txpath.clear();
-    txpath.push_back("../Resources/textures/container.jpg");
+    txpath.insert( pair<string,string>("diffuseMap","../Resources/textures/container.jpg"));
     cb1mat.SetUpTextures(txpath);
     cub1->SetMaterial(cb1mat);
+    cub1->SetCastShadow(true);
 
     EntityBase* cub2 = new Cube();
     tmpvec = glm::vec3(1.0f,1.0f,1.0f);
@@ -108,6 +109,7 @@ int main()
     tmpvec = glm::vec3(2.0f,0.0f,0.0f);
     cub2->GetTransform().SetPosition(tmpvec);
     cub2->SetMaterial(cb1mat);
+    cub2->SetCastShadow(true);
 
     //创建floor
     EntityBase* floor = new Plane();
@@ -116,9 +118,10 @@ int main()
     tmpvec = glm::vec3(0.0f,-0.5f,0.0f);
     floor->GetTransform().SetPosition(tmpvec);
     Material planemat;
-    planemat.SetUpShader(shaderpathprefix+"/5.2.framebuffers.vs",shaderpathprefix+"/5.2.framebuffers.fs","");
+    //planemat.SetUpShader(shaderpathprefix+"/5.2.framebuffers.vs",shaderpathprefix+"/5.2.framebuffers.fs","");
+    planemat.SetUpShader(shaderpathprefix+"/Shadow/shadow_mapping.vs",shaderpathprefix+"/Shadow/shadow_mapping.fs","");
     txpath.clear();
-    txpath.push_back("../Resources/textures/metal.png");
+    txpath.insert(pair<string,string>("diffuseMap", "../Resources/textures/metal.png"));
     planemat.SetUpTextures(txpath);
     floor->SetMaterial(planemat);
 
@@ -135,7 +138,7 @@ int main()
     grassmat.SetAlpha(true);
     grassmat.SetUpShader(shaderpathprefix+"/5.2.framebuffers.vs",shaderpathprefix+"/5.2.framebuffers.fs","");
     txpath.clear();
-    txpath.push_back("../Resources/textures/grass.png");
+    txpath.insert(pair<string,string>("diffuseMap","../Resources/textures/grass.png"));
     grassmat.SetUpTextures(txpath);
     for(;grassit != grasspos.end();++grassit){
         EntityBase* grass = new Plane();
@@ -143,7 +146,7 @@ int main()
         grass->GetTransform().SetPosition(tmpvec);
         grass->GetTransform().SetRotation(glm::vec3(glm::radians(-90.0f),0.0f,0.0f));
         grass->SetMaterial(grassmat);
-        scene.AddSceneObj(grass);
+        //scene.AddSceneObj(grass);
     }
 
     grassit = grasspos.begin();
@@ -151,7 +154,7 @@ int main()
     glassmat.SetAlpha(true);
     glassmat.SetUpShader(shaderpathprefix+"/5.2.framebuffers.vs",shaderpathprefix+"/5.2.framebuffers.fs","");
     txpath.clear();
-    txpath.push_back("../Resources/textures/window.png");
+    txpath.insert(pair<string,string>("diffuseMap","../Resources/textures/window.png"));
     glassmat.SetUpTextures(txpath);
     for(;grassit != grasspos.end();++grassit){
         EntityBase* glass = new Plane();
@@ -159,7 +162,7 @@ int main()
         glass->GetTransform().SetPosition(tmpvec);
         glass->GetTransform().SetRotation(glm::vec3(glm::radians(-90.0f),0.0f,0.0f));
         glass->SetMaterial(glassmat);
-        scene.AddSceneObj(glass);
+        //scene.AddSceneObj(glass);
     }
 
     //创建一个天空盒
@@ -169,7 +172,7 @@ int main()
 
     //添加灯光
     EntityBase* light = new Light();
-    glm::vec3 lightPos(-2.0f, 2.0f, 3.0f);
+    glm::vec3 lightPos(-2.0f, 2.0f, -3.0f);
     light->SetPosition(lightPos);
     tmpvec = glm::vec3(0.2f,0.2f,0.2f);
     light->GetTransform().SetScale(tmpvec );
@@ -194,13 +197,13 @@ int main()
     suitmodel.GetTransform().SetScale(tmpvec );
     tmpvec = glm::vec3(4.0f,1.5f,0.0f);
     suitmodel.GetTransform().SetPosition(tmpvec);
-    scene.AddSceneObj(&suitmodel);
+    //scene.AddSceneObj(&suitmodel);
 
     Model back("../Resources/objects/backpack/backpack.obj");
     tmpvec = glm::vec3(0.4f,0.4f,0.4f);
     back.GetTransform().SetScale(tmpvec );
     back.SetMaterial(normalMat);
-    scene.AddSceneObj(&back);
+    //scene.AddSceneObj(&back);
 
     Model planet("../Resources/objects/planet/planet.obj");
     planet.SetMaterial(normalMat);
@@ -208,7 +211,7 @@ int main()
     planet.GetTransform().SetScale(tmpvec );
     tmpvec = glm::vec3(2.0f,3.5f,0.0f);
     planet.GetTransform().SetPosition(tmpvec);
-    scene.AddSceneObj(&planet);
+    //scene.AddSceneObj(&planet);
 
     Model cyborg("../Resources/objects/cyborg/cyborg.obj");
     cyborg.SetMaterial(normalMat);
@@ -216,7 +219,7 @@ int main()
     cyborg.GetTransform().SetScale(tmpvec );
     tmpvec = glm::vec3(0.0f,0.0f,0.8f);
     cyborg.GetTransform().SetPosition(tmpvec);
-    scene.AddSceneObj(&cyborg);
+    //scene.AddSceneObj(&cyborg);
 
     //Model sponza("../Resources/objects/crytek-sponza/sponza.obj");
     //sponza.SetMaterial(normalMat);
